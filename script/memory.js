@@ -2,7 +2,7 @@
 let case_concernee = document.querySelectorAll(".card");
 /* console.log(case_concernee); */
 
-let nb_case =  16; // doit être un multiple de 4
+let nb_case =  16; // doit être un multiple de 4 _ pas au délà de 24
 let val_temps = 50 ;
 
 let index_case ;
@@ -62,11 +62,9 @@ function grille(sorted_tab_index_case)
     let sorted_tab = sorted_tab_index_case;
 
     let div_container = document.getElementsByClassName("grille");
-    // on transforme le HTMLCollector en Tableau pour pouvoir le parser
-    let container_item = [].map.call(div_container, item => item); 
-    
+    console.log(div_container) ;
 
-    let n=0; //artifice s'incrémente en fin de boucle de +4
+    let n=0; //artifice, s'incrémente en fin de boucle de +4
     for (let j=0; j<nb_case/4 ; j++)// 
     {    
         chaine += 
@@ -92,6 +90,11 @@ function grille(sorted_tab_index_case)
         chaine += "</div>";
         n = n+4;
     }
+
+    // on transforme le HTMLCollector en Tableau pour pouvoir le parser
+    let container_item = [].map.call(div_container, item => item); 
+    console.log(container_item) ;
+    
     container_item.forEach(function(item, index)
     {
         item.innerHTML= chaine;
@@ -100,15 +103,13 @@ function grille(sorted_tab_index_case)
 
     tabCartes = document.querySelectorAll(".card"); 
     return tabCartes ;
-    /* console.log(chaine); */
+    
 }
 
 function cardClicked(){    
 
     console.log("cardClicked()", tabCartes)
-
     for (let i=0; i<tabCartes.length; i++){    
-
     
         tabCartes[i].addEventListener("click", function(){
 
@@ -117,8 +118,7 @@ function cardClicked(){
                 tabCartes[i].lastChild.hidden = false;// au click la carte back (last child) n'est plus masquée 
 
                 let verif_match = false ;
-                console.log("card clicked !!! nb click :", nb_click)
-                console.log(tabCartes[i].lastChild.hidden);
+                console.log("card clicked !!! nb click :", nb_click) ; console.log(tabCartes[i].lastChild.hidden);
     
                 if (nb_click == 0)// 1er click
                 {                   
@@ -204,7 +204,6 @@ function hiddenCard(){
     click2_index="";
 }
 
-
 function end(){
 
     // Est appelée depuis la fct isMatched
@@ -254,7 +253,7 @@ function end(){
         
         let scoreStocke = localStorage.getItem(pseudo_stock); 
         let chaine = ""; 
-        let tab_scores = document.getElementById("tab_scores");       
+        let tab_scores = document.getElementById("memory_scores");       
         
         if (scoreStocke === null)
         {
@@ -268,9 +267,15 @@ function end(){
         // Récupérer les informations de LocalStorage pour mettre à jour le tableau des scores HTML
         for (i=0 ; i<localStorage.length ; i++) {
             let joueur = localStorage.key(i);
-            let score_a_afficher = localStorage.getItem(joueur);
-            chaine = chaine + "<br/>" + joueur + " : " + score_a_afficher + "<br/>"
-        }       
+            if (joueur.includes("autoSaved")||joueur.includes("Console")||joueur.includes("Table")||joueur.includes("Query")||joueur.includes("Navigation")){
+                // on ne fait rien
+            }
+            else {let score_a_afficher = localStorage.getItem(joueur);
+                chaine = chaine + "<br/>" + joueur + " : " + score_a_afficher + "<br/>"
+            }
+            
+        }   
+        console.log(chaine);
         tab_scores.innerHTML = chaine ;
         // ---- > FIN 
 
@@ -302,34 +307,36 @@ function currentTime(){
 
     if (arret == false) {
         verif_time = setInterval(() =>{
-
-        if (temps == "00" && arret == false)
-        {
-            arret = Boolean(true) ;
-            if (arret == true) {
-                end();
-                clearInterval(verif_time);
+            if (temps == "00" && arret == false)
+            {
+                arret = Boolean(true) ;
+                if (arret == true) {
+                    end();
+                    clearInterval(verif_time);
+                }
             }
-        }
         }     
         , 1000); 
     }
 }
    
-
 function nelle_Partie() {
     // Appelée depuis la fonction End();
     arret = Boolean(false) ; 
 
-    if (confirm("Voulez vous faire une nouvelle partie?")) {
+    let nellePartie = confirm("Voulez vous faire une nouvelle partie?");
+
+    if (nellePartie) {
         setTimeout(() => {
             initialisationPlateau();
           }, 100)
     }
     else{
         alert("Non merci ; pas de nouvelle partie ;")
-        console.log("Pas de nouvelle partie, valeur var arret (doit être à false):", arret)
+        arret = true;
     }
+
+    return arret ;
 }
 
 function nbAleaUnik() {
